@@ -1,0 +1,69 @@
+{{ block styles }}
+    <style>
+        .selection {
+            display: flex;
+            align-items: center;
+        }
+        .selection > input {
+            margin-right: 10px;
+        }
+        .selection > .content {
+            padding: 5px;
+            border: 2px solid black;
+            border-radius: 5px;
+            background-color: #99FFFF;
+        }
+    </style>
+{{ endblock }}
+
+{{ block content }}
+    <p>以下に提示されている２つの選択肢は2つの異なるアパートの属性です。提示されている属性以外の条件はすべて同じと考え、好みの１つを選んで下さい。</p>
+
+    <div class="container">
+        <div class="row">
+            {{ for option in items }}
+                <div class="col-6 selection">
+                    <input type="radio" name="answer" value="{{ forloop.counter0 }}">
+                    <div class="content">
+                        {{ for k, v in option.items() }}
+                            <p>{{ k }}: {{ v }}</p>
+                        {{ endfor }}
+                    </div>
+                </div>
+            {{ endfor }}
+        </div>
+    </div>
+    <br>
+
+    {{ next_button }}
+
+{{ endblock }}
+
+{{ block scripts }}
+    <script>
+        next_btn = document.getElementsByClassName("otree-btn-next")[0];
+        next_btn.type = "button";
+        next_btn.addEventListener("click", function() {
+            // radio_buttons = document.getElementsByClassName("answer");
+            // for(i = 0; i < radio_buttons.length; i++) {
+            //     if(element.checked){
+            //         answer = element.value;
+            //     };
+            // };
+            answer = document.querySelector('input[name="answer"]:checked').value;
+            liveSend({
+                'answer': answer,
+            });
+        });
+
+        function liveRecv(data){
+            if(data['submit']){
+                document.getElementById("form").submit();
+                return;
+            };
+            if(data['next']){
+                window.location.reload();
+            }
+        }
+    </script>
+{{ endblock }}
