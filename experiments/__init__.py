@@ -249,10 +249,14 @@ def live_method(player: Player, data):
         setattr(player, "answer_times_" + player.current_stage, getattr(player, "answer_times_" + player.current_stage) + "&" + str(int(answer_time - player.start_time)))
     
     player.start_time = answer_time
+    if player.current_stage == "eval":
+        end_round = C.record_times
+    else:
+        end_round = C.bace_round
     return {
         player.id_in_group: dict(
             next = True,
-            submit = True if len(getattr(player, "answers_" + player.current_stage).split("&")) == C.bace_round else False,
+            submit = True if len(getattr(player, "answers_" + player.current_stage).split("&")) == end_round else False,
         )
     }
 
