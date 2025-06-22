@@ -55,7 +55,7 @@ class C(BaseConstants):
     reference = dict(
         price = "家賃",
         room_size = "部屋の広さ",
-        distance_to_university = "学校までの距離",
+        distance_to_university = "学校までの距離(徒歩)",
         city_center = "立地",
         floor = "階層",
     )
@@ -136,7 +136,7 @@ class Player(BasePlayer):
 
     price = models.StringField(label="家賃", choices=C.prior["price"])
     room_size = models.StringField(label="部屋の広さ", choices=C.prior["room_size"])
-    distance_to_university = models.StringField(label="学校までの距離", choices=C.prior["distance_to_university"])
+    distance_to_university = models.StringField(label="学校までの距離(徒歩)", choices=C.prior["distance_to_university"])
     city_center = models.StringField(label="立地", choices=C.prior["city_center"])
     floor = models.StringField(label="階層", choices=C.prior["floor"])
 
@@ -202,11 +202,11 @@ def selection_set(player: Player, reverse=False, random=False, eval=False):
     
     if player.current_stage != "eval":
         if getattr(player, "posterior_" + player.current_stage) == "":
-            if len(getattr(player, "selection_set_" + player.current_stage).split("&")) == int(C.bace_round / C.record_times):
-                setattr(player, "posterior_" + player.current_stage, posterior.to_string())
+            # if len(getattr(player, "selection_set_" + player.current_stage).split("&")) == int(C.bace_round / C.record_times):
+            setattr(player, "posterior_" + player.current_stage, posterior.to_csv(index=False))
         else:
-            if len(getattr(player, "selection_set_" + player.current_stage).split("&")) == int(C.bace_round / C.record_times) * (len(getattr(player, "posterior_" + player.current_stage).split("&"))):
-                setattr(player, "posterior_" + player.current_stage, getattr(player, "posterior_" + player.current_stage) + "&" + posterior.to_string())
+            # if len(getattr(player, "selection_set_" + player.current_stage).split("&")) == int(C.bace_round / C.record_times) * (len(getattr(player, "posterior_" + player.current_stage).split("&")) + 1):
+            setattr(player, "posterior_" + player.current_stage, getattr(player, "posterior_" + player.current_stage) + "&" + posterior.to_csv(index=False))
     return ret
 
 def convert_to_items(selection_set: dict):

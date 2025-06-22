@@ -5,7 +5,7 @@ import scipy.stats as stats
 
 # Metadata
 author       = 'Pen Example Application'
-size_thetas  = 2500                       # Number of samples drawn from the prior
+size_thetas  = 1000                       # Number of samples drawn from the prior
 max_opt_time = 5                          # Time limit (in seconds) for Bayesian optimization per round
 
 # Configuration for Mango Bayesian Optimizer
