@@ -19,7 +19,7 @@ class C(BaseConstants):
     NUM_ROUNDS = 1
 
     bace_round = 30
-    record_times = 3
+    record_times = 1
 
     rest_time = 10 # in seconds
 
@@ -183,9 +183,11 @@ def selection_set(player: Player, reverse=False, random=False, eval=False):
         bace = BACE(user_config_2)
         if reverse: bace = BACE(user_config_1)
     if eval:
+        added_key = []
         for k, v in user_config_2.design_params.items():
             if not k in user_config_1.design_params.keys():
                 user_config_1.design_params[k] = v
+                added_key.append(k)
         bace = BACE(user_config_1)
     
     if getattr(player, "selection_set_" + player.current_stage) != "":
@@ -193,6 +195,10 @@ def selection_set(player: Player, reverse=False, random=False, eval=False):
             bace.add_record(json.loads(selection_set), int(getattr(player, "answers_" + player.current_stage).split("&")[i]))
     
     ret, posterior = bace.interactive_bace_steps(random)
+    ret = convert_numpy(ret)
+    if eval:
+        for k in added_key:
+            if k in user_config_1.design_params: del user_config_1.design_params[k]
     # print(ret)
     if getattr(player, "selection_set_" + player.current_stage) == "":
         setattr(player, "selection_set_" + player.current_stage, json.dumps(ret, ensure_ascii=False))
@@ -208,6 +214,18 @@ def selection_set(player: Player, reverse=False, random=False, eval=False):
             # if len(getattr(player, "selection_set_" + player.current_stage).split("&")) == int(C.bace_round / C.record_times) * (len(getattr(player, "posterior_" + player.current_stage).split("&")) + 1):
             setattr(player, "posterior_" + player.current_stage, getattr(player, "posterior_" + player.current_stage) + "&" + posterior.to_csv(index=False))
     return ret
+
+def convert_numpy(data):
+    if isinstance(data, (np.integer, np.int64)):
+        return int(data)
+    elif isinstance(data, (np.floating, np.float64)):
+        return float(data)
+    elif isinstance(data, dict):
+        return {k: convert_numpy(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [convert_numpy(item) for item in data]
+    else:
+        return data  
 
 def convert_to_items(selection_set: dict):
     items = [dict(), dict()]
